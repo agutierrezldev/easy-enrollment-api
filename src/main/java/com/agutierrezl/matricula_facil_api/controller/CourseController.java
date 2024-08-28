@@ -3,6 +3,7 @@ package com.agutierrezl.matricula_facil_api.controller;
 import com.agutierrezl.matricula_facil_api.dto.CourseDTO;
 import com.agutierrezl.matricula_facil_api.model.Course;
 import com.agutierrezl.matricula_facil_api.service.ICourseService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.MediaType;
@@ -40,7 +41,7 @@ public class CourseController {
     }
 
     @PostMapping
-    public Mono<ResponseEntity<Mono<CourseDTO>>> save(@RequestBody CourseDTO courseDTO, final ServerHttpRequest request){
+    public Mono<ResponseEntity<Mono<CourseDTO>>> save(@Valid @RequestBody CourseDTO courseDTO, final ServerHttpRequest request){
         return courseService.save(this.convertToDocument(courseDTO))
                 .map(this::convertToDTO)
                 .map(co->ResponseEntity.created(
@@ -52,7 +53,7 @@ public class CourseController {
     }
 
     @PutMapping("/{id}")
-    public Mono<ResponseEntity<CourseDTO>> update(@PathVariable("id") String id, @RequestBody CourseDTO courseDTO){
+    public Mono<ResponseEntity<CourseDTO>> update(@PathVariable("id") String id, @Valid @RequestBody CourseDTO courseDTO){
         return Mono.just(convertToDocument(courseDTO)).map(
                         c -> {
                             c.setId(id);

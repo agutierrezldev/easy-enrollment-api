@@ -16,7 +16,7 @@ public abstract class CRUDImpl<T,ID> implements ICRUD<T,ID> {
 
     @Override
     public Mono<T> update(ID id, T t) {
-        return getRepository().save(t);
+        return getRepository().findById(id).flatMap(e->save(t));
     }
 
     @Override
@@ -31,6 +31,13 @@ public abstract class CRUDImpl<T,ID> implements ICRUD<T,ID> {
 
     @Override
     public Mono<Boolean> delete(ID id) {
-        return getRepository().deleteById(id).thenReturn(true);
+        return getRepository().findById(id)
+                .hasElement().flatMap(result -> {
+                    if(result){
+                        return getRepository().deleteById(id).thenReturn(true);
+                    }else{
+                        return Mono.just(false);
+                    }
+                });
     }
 }
