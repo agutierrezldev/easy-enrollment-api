@@ -1,8 +1,10 @@
 package com.agutierrezl.matricula_facil_api.controller;
 
+import com.agutierrezl.matricula_facil_api.dto.CourseDTO;
 import com.agutierrezl.matricula_facil_api.model.Course;
 import com.agutierrezl.matricula_facil_api.service.ICourseService;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -18,17 +20,19 @@ import java.net.URI;
 public class CourseController {
 
     private final ICourseService courseService;
+    private final ModelMapper modelMapper;
 
     @GetMapping
-    public Mono<ResponseEntity<Flux<Course>>> findByAll(){
-        Flux<Course> courses = courseService.findAll();
+    public Mono<ResponseEntity<Flux<CourseDTO>>> findByAll(){
+        Flux<CourseDTO> courses = courseService.findAll().map(this::convertToDTO);
         return Mono.just(ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(courses))
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/{id}")
-    public Mono<ResponseEntity<Mono<Course>>> findById(@PathVariable("id") String id){
+    public Mono<ResponseEntity<Mono<CourseDTO>>> findById(@PathVariable("id") String id){
         return courseService.findById(id)
+                .map(this::convertToDTO)
                 .map(course -> ResponseEntity.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(Mono.just(course))
@@ -36,10 +40,11 @@ public class CourseController {
     }
 
     @PostMapping
-    public Mono<ResponseEntity<Mono<Course>>> save(@RequestBody Course course, final ServerHttpRequest request){
-        return courseService.save(course)
+    public Mono<ResponseEntity<Mono<CourseDTO>>> save(@RequestBody CourseDTO courseDTO, final ServerHttpRequest request){
+        return courseService.save(this.convertToDocument(courseDTO))
+                .map(this::convertToDTO)
                 .map(co->ResponseEntity.created(
-                                URI.create(request.getURI().toString().concat("/").concat(course.getId())))
+                                URI.create(request.getURI().toString().concat("/").concat(co.getId())))
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(Mono.just(co))
                 )
@@ -47,13 +52,15 @@ public class CourseController {
     }
 
     @PutMapping("/{id}")
-    public Mono<ResponseEntity<Course>> update(@PathVariable("id") String id, @RequestBody Course course){
-        return Mono.just(course).map(
+    public Mono<ResponseEntity<CourseDTO>> update(@PathVariable("id") String id, @RequestBody CourseDTO courseDTO){
+        return Mono.just(convertToDocument(courseDTO)).map(
                         c -> {
                             c.setId(id);
                             return c;
                         })
-                .flatMap(e->courseService.update(id,e))
+                .flatMap(
+                        e -> courseService.update(id,e)
+                ).map(this::convertToDTO)
                 .map(e->ResponseEntity.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(e))
@@ -70,6 +77,14 @@ public class CourseController {
                         return Mono.just(ResponseEntity.notFound().build());
                     }
                 });
+    }
+
+    private CourseDTO convertToDTO (Course model){
+        return  modelMapper.map(model,CourseDTO.class);
+    }
+
+    private Course convertToDocument (CourseDTO dto){
+        return  modelMapper.map(dto,Course.class);
     }
 
 }
