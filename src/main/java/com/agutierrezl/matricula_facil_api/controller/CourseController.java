@@ -12,6 +12,8 @@ import reactor.core.publisher.Mono;
 
 import java.net.URI;
 
+@RestController
+@RequestMapping("/courses")
 @RequiredArgsConstructor
 public class CourseController {
 
@@ -21,7 +23,7 @@ public class CourseController {
     public Mono<ResponseEntity<Flux<Course>>> findByAll(){
         Flux<Course> courses = courseService.findAll();
         return Mono.just(ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(courses))
-                .thenReturn(ResponseEntity.notFound().build());
+                .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/{id}")

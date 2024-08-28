@@ -8,22 +8,28 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(collection = "courses")
+@Document(collection = "enrollments")
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class Course {
+public class Enrollment {
 
     @Id
     @EqualsAndHashCode.Include
     private String id;
 
     @Field
-    private String name;
+    private LocalDateTime enrollmentDate;
 
     @Field
-    private String code;
+    private Student student;
+
+    @Field
+    private List<Course> courses;
 
     @Field
     private boolean status;

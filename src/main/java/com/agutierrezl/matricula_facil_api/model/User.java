@@ -8,23 +8,28 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(collection = "courses")
+@Document(collection = "users")
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class Course {
+public class User {
 
     @Id
     @EqualsAndHashCode.Include
     private String id;
 
     @Field
-    private String name;
+    private String username;
 
     @Field
-    private String code;
+    private String password;
 
     @Field
     private boolean status;
+
+    @Field
+    private List<Role> roles;
 }

@@ -11,9 +11,9 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(collection = "courses")
+@Document(collection = "students")
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class Course {
+public class Student {
 
     @Id
     @EqualsAndHashCode.Include
@@ -23,8 +23,11 @@ public class Course {
     private String name;
 
     @Field
-    private String code;
+    private String surname;
 
     @Field
-    private boolean status;
+    private String dni;
+
+    @Field
+    private Integer year;
 }
