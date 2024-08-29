@@ -2,10 +2,12 @@ package com.agutierrezl.matricula_facil_api.controller;
 
 import com.agutierrezl.matricula_facil_api.dto.CourseDTO;
 import com.agutierrezl.matricula_facil_api.model.Course;
+import com.agutierrezl.matricula_facil_api.pagination.PageSupport;
 import com.agutierrezl.matricula_facil_api.service.ICourseService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -78,6 +80,25 @@ public class CourseController {
                         return Mono.just(ResponseEntity.notFound().build());
                     }
                 });
+    }
+
+
+    @GetMapping("/pageable")
+    public Mono<ResponseEntity<PageSupport<CourseDTO>>> getPage(
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "2") int size
+    ){
+        return courseService.getPage(PageRequest.of(page, size))
+                .map(pageSupport -> new PageSupport<>(
+                        pageSupport.getContent().stream().map(this::convertToDTO).toList(),
+                        pageSupport.getPageNumber(),
+                        pageSupport.getPageSize(),
+                        pageSupport.getTotalElements()
+                ))
+                .map(e -> ResponseEntity.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(e))
+                .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
     private CourseDTO convertToDTO (Course model){
