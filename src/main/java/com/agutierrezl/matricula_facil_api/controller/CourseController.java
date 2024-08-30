@@ -8,6 +8,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -16,6 +18,9 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
+
+import static org.springframework.hateoas.server.reactive.WebFluxLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.reactive.WebFluxLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/courses")
@@ -61,9 +66,8 @@ public class CourseController {
                             c.setId(id);
                             return c;
                         })
-                .flatMap(
-                        e -> courseService.update(id,e)
-                ).map(this::convertToDTO)
+                .flatMap(e ->courseService.update(id,e))
+                .map(this::convertToDTO)
                 .map(e->ResponseEntity.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(e))
@@ -99,6 +103,32 @@ public class CourseController {
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(e))
                 .defaultIfEmpty(ResponseEntity.notFound().build());
+    }
+
+    private CourseDTO courseDtoHateoas;
+
+    @GetMapping("/hateoas/{id}")
+    public Mono<EntityModel<CourseDTO>> getHateos(@PathVariable("id") String id){
+        Mono<Link> monoLink = linkTo(methodOn(CourseController.class).findById(id)).withRel("course-info").toMono();
+
+        // Common practice
+        /* return courseService.findById(id)
+                .map(this::convertToDTO)
+                .flatMap(d->{
+                    this.courseDtoHateoas = d;
+                    return monoLink;
+                })
+                .map(link -> EntityModel.of(this.courseDtoHateoas,link)); */
+
+        // Intermediate practice
+        /* return courseService.findById(id)
+                .map(this::convertToDTO)
+                .flatMap(courseDTO -> monoLink.map(link->EntityModel.of(courseDTO,link))); */
+
+        // Ideal practice
+        return courseService.findById(id)
+                .map(this::convertToDTO)
+                .zipWith(monoLink , EntityModel::of); //(courseDTO, link) -> EntityModel.of(courseDTO, link)
     }
 
     private CourseDTO convertToDTO (Course model){

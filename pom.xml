@@ -58,7 +58,7 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!--use by SpringBoot 2.3-->
+		<!-- use from SpringBoot 2.3 - validation DTO -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
@@ -73,6 +73,13 @@
 			<groupId>org.modelmapper</groupId>
 			<artifactId>modelmapper</artifactId>
 			<version>3.2.0</version>
+		</dependency>
+
+		<!-- use to hateoas  -->
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-hateoas</artifactId>
+			<version>1.8.0</version>
 		</dependency>
 
 	</dependencies>
