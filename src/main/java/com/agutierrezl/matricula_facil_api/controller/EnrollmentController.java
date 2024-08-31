@@ -133,6 +133,16 @@ public class EnrollmentController {
                 .zipWith(monoLink , EntityModel::of); //(EnrollmentDTO, link) -> EntityModel.of(EnrollmentDTO, link)
     }
 
+
+    @GetMapping("/generateReport/{id}")
+    public Mono<ResponseEntity<byte[]>> generateReport(@PathVariable("id") String id){
+        return enrollmentService.generteReport(id)
+                .map(bytes -> ResponseEntity.ok()
+                        .contentType(MediaType.APPLICATION_PDF)
+                        .body(bytes))
+                .defaultIfEmpty(ResponseEntity.notFound().build());
+    }
+
     private EnrollmentDTO convertToDTO (Enrollment model){
         return  modelMapper.map(model,EnrollmentDTO.class);
     }
