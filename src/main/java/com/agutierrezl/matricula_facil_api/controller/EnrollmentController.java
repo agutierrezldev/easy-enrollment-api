@@ -1,9 +1,9 @@
 package com.agutierrezl.matricula_facil_api.controller;
 
-import com.agutierrezl.matricula_facil_api.dto.CourseDTO;
-import com.agutierrezl.matricula_facil_api.model.Course;
+import com.agutierrezl.matricula_facil_api.dto.EnrollmentDTO;
+import com.agutierrezl.matricula_facil_api.model.Enrollment;
 import com.agutierrezl.matricula_facil_api.pagination.PageSupport;
-import com.agutierrezl.matricula_facil_api.service.ICourseService;
+import com.agutierrezl.matricula_facil_api.service.IEnrollmentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -24,34 +24,34 @@ import static org.springframework.hateoas.server.reactive.WebFluxLinkBuilder.lin
 import static org.springframework.hateoas.server.reactive.WebFluxLinkBuilder.methodOn;
 
 @RestController
-@RequestMapping("/courses")
+@RequestMapping("/enrollments")
 @RequiredArgsConstructor
-public class CourseController {
+public class EnrollmentController {
 
-    private final ICourseService courseService;
-    @Qualifier("defaultMapper")
+    private final IEnrollmentService enrollmentService;
+    @Qualifier("enrollmentMapper")
     private final ModelMapper modelMapper;
 
     @GetMapping
-    public Mono<ResponseEntity<Flux<CourseDTO>>> findByAll(){
-        Flux<CourseDTO> courses = courseService.findAll().map(this::convertToDTO);
-        return Mono.just(ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(courses))
+    public Mono<ResponseEntity<Flux<EnrollmentDTO>>> findByAll(){
+        Flux<EnrollmentDTO> Enrollments = enrollmentService.findAll().map(this::convertToDTO);
+        return Mono.just(ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(Enrollments))
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/{id}")
-    public Mono<ResponseEntity<Mono<CourseDTO>>> findById(@PathVariable("id") String id){
-        return courseService.findById(id)
+    public Mono<ResponseEntity<Mono<EnrollmentDTO>>> findById(@PathVariable("id") String id){
+        return enrollmentService.findById(id)
                 .map(this::convertToDTO)
-                .map(course -> ResponseEntity.ok()
+                .map(Enrollment -> ResponseEntity.ok()
                         .contentType(MediaType.APPLICATION_JSON)
-                        .body(Mono.just(course))
+                        .body(Mono.just(Enrollment))
                 ).defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public Mono<ResponseEntity<Mono<CourseDTO>>> save(@Valid @RequestBody CourseDTO courseDTO, final ServerHttpRequest request){
-        return courseService.save(this.convertToDocument(courseDTO))
+    public Mono<ResponseEntity<Mono<EnrollmentDTO>>> save(@Valid @RequestBody EnrollmentDTO EnrollmentDTO, final ServerHttpRequest request){
+        return enrollmentService.save(this.convertToDocument(EnrollmentDTO))
                 .map(this::convertToDTO)
                 .map(co->ResponseEntity.created(
                                 URI.create(request.getURI().toString().concat("/").concat(co.getId())))
@@ -62,13 +62,13 @@ public class CourseController {
     }
 
     @PutMapping("/{id}")
-    public Mono<ResponseEntity<CourseDTO>> update(@PathVariable("id") String id, @Valid @RequestBody CourseDTO courseDTO){
-        return Mono.just(convertToDocument(courseDTO)).map(
+    public Mono<ResponseEntity<EnrollmentDTO>> update(@PathVariable("id") String id, @Valid @RequestBody EnrollmentDTO EnrollmentDTO){
+        return Mono.just(convertToDocument(EnrollmentDTO)).map(
                         c -> {
                             c.setId(id);
                             return c;
                         })
-                .flatMap(e ->courseService.update(id,e))
+                .flatMap(e ->enrollmentService.update(id,e))
                 .map(this::convertToDTO)
                 .map(e->ResponseEntity.ok()
                         .contentType(MediaType.APPLICATION_JSON)
@@ -78,7 +78,7 @@ public class CourseController {
 
     @DeleteMapping("/{id}")
     public Mono<ResponseEntity<Void>> delete(@PathVariable("id") String id){
-        return courseService.delete(id)
+        return enrollmentService.delete(id)
                 .flatMap(result -> {
                     if(result){
                         return Mono.just(ResponseEntity.noContent().build());
@@ -90,11 +90,11 @@ public class CourseController {
 
 
     @GetMapping("/pageable")
-    public Mono<ResponseEntity<PageSupport<CourseDTO>>> getPage(
+    public Mono<ResponseEntity<PageSupport<EnrollmentDTO>>> getPage(
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "2") int size
     ){
-        return courseService.getPage(PageRequest.of(page, size))
+        return enrollmentService.getPage(PageRequest.of(page, size))
                 .map(pageSupport -> new PageSupport<>(
                         pageSupport.getContent().stream().map(this::convertToDTO).toList(),
                         pageSupport.getPageNumber(),
@@ -107,38 +107,38 @@ public class CourseController {
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
-    private CourseDTO courseDtoHateoas;
+    private EnrollmentDTO EnrollmentDtoHateoas;
 
     @GetMapping("/hateoas/{id}")
-    public Mono<EntityModel<CourseDTO>> getHateos(@PathVariable("id") String id){
-        Mono<Link> monoLink = linkTo(methodOn(CourseController.class).findById(id)).withRel("course-info").toMono();
+    public Mono<EntityModel<EnrollmentDTO>> getHateos(@PathVariable("id") String id){
+        Mono<Link> monoLink = linkTo(methodOn(EnrollmentController.class).findById(id)).withRel("Enrollment-info").toMono();
 
         // Common practice
-        /* return courseService.findById(id)
+        /* return EnrollmentService.findById(id)
                 .map(this::convertToDTO)
                 .flatMap(d->{
-                    this.courseDtoHateoas = d;
+                    this.EnrollmentDtoHateoas = d;
                     return monoLink;
                 })
-                .map(link -> EntityModel.of(this.courseDtoHateoas,link)); */
+                .map(link -> EntityModel.of(this.EnrollmentDtoHateoas,link)); */
 
         // Intermediate practice
-        /* return courseService.findById(id)
+        /* return EnrollmentService.findById(id)
                 .map(this::convertToDTO)
-                .flatMap(courseDTO -> monoLink.map(link->EntityModel.of(courseDTO,link))); */
+                .flatMap(EnrollmentDTO -> monoLink.map(link->EntityModel.of(EnrollmentDTO,link))); */
 
         // Ideal practice
-        return courseService.findById(id)
+        return enrollmentService.findById(id)
                 .map(this::convertToDTO)
-                .zipWith(monoLink , EntityModel::of); //(courseDTO, link) -> EntityModel.of(courseDTO, link)
+                .zipWith(monoLink , EntityModel::of); //(EnrollmentDTO, link) -> EntityModel.of(EnrollmentDTO, link)
     }
 
-    private CourseDTO convertToDTO (Course model){
-        return  modelMapper.map(model,CourseDTO.class);
+    private EnrollmentDTO convertToDTO (Enrollment model){
+        return  modelMapper.map(model,EnrollmentDTO.class);
     }
 
-    private Course convertToDocument (CourseDTO dto){
-        return  modelMapper.map(dto,Course.class);
+    private Enrollment convertToDocument (EnrollmentDTO dto){
+        return  modelMapper.map(dto,Enrollment.class);
     }
 
 }

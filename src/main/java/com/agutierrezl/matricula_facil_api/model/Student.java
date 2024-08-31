@@ -20,10 +20,10 @@ public class Student {
     private String id;
 
     @Field
-    private String name;
+    private String firstName;
 
     @Field
-    private String surname;
+    private String lastName;
 
     @Field
     private String dni;
