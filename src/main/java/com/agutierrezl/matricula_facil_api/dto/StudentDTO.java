@@ -11,18 +11,23 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class CourseDTO {
+public class StudentDTO {
 
     private String id;
 
     @NotNull
-    @Size(min = 2, max = 20)
-    private String nameCourse;
+    @Size(min = 1, max = 255)
+    private String name;
 
     @NotNull
-    @Size(min = 1, max = 10)
-    private String codeCourse;
+    @Size(min = 1, max = 255)
+    private String surname;
 
-    private boolean statusCourse;
+    @NotNull
+    @Size(min = 8, max = 8)
+    private String dni;
+
+    @NotNull
+    private Integer year;
 
 }
