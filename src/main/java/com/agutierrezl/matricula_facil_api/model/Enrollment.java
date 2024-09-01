@@ -29,7 +29,7 @@ public class Enrollment {
     private Student student;
 
     @Field
-    private List<Course> courses;
+    private List<EnrollmentDetail> items;
 
     @Field
     private boolean status;
