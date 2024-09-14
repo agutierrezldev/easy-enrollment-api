@@ -15,7 +15,9 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.*;
 import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -37,36 +39,43 @@ public class WebExceptionHandler extends AbstractErrorWebExceptionHandler {
 
         Map<String, Object> generalError = getErrorAttributes(req, ErrorAttributeOptions.defaults());
 
-        int statusCode = Integer.parseInt(generalError.get("status").toString());
+        String statusCode = generalError.get("status").toString();
         Throwable error = getError(req);
         // HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 
-        CustomError customError = new CustomError(error.getMessage(), 418, HttpStatus.I_AM_A_TEAPOT);
+        CustomError customError = new CustomError(error.getMessage(), "418", HttpStatus.I_AM_A_TEAPOT, null);
 
-        switch (statusCode){
-            case 400, 402 -> {
+        switch (statusCode) {
+            case "400" -> {
+                List<CustomErrorInput> errors = new CustomErrorInput().getErrors(error.getMessage());
+                customError.setMessage(!errors.isEmpty() ? HttpStatus.BAD_REQUEST.toString() : error.getMessage());
+                customError.setErrors(!errors.isEmpty() ? errors : null);
+                customError.setStatus(statusCode);
+                customError.setHttpStatus(HttpStatus.BAD_REQUEST);
+            }
+            case "402" -> {
                 /* customError.put("message",error.getMessage());
                 customError.put("status", statusCode);
                 httpStatus = HttpStatus.BAD_REQUEST; */
                 customError.setStatus(statusCode);
                 customError.setHttpStatus(HttpStatus.BAD_REQUEST);
             }
-            case 404 -> {
+            case "404" -> {
                 customError.setStatus(statusCode);
                 customError.setHttpStatus(HttpStatus.NOT_FOUND);
             }
-            case 401,403 -> {
+            case "401", "403" -> {
                 customError.setStatus(statusCode);
                 customError.setHttpStatus(HttpStatus.UNAUTHORIZED);
             }
-            case 500 -> {
+            case "500" -> {
                 customError.setStatus(statusCode);
                 customError.setHttpStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
         }
 
-        return  ServerResponse.status(customError.getHttpStatus())
+        return ServerResponse.status(customError.getHttpStatus())
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(customError));
     }
