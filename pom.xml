@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.agutierrezl</groupId>
-	<artifactId>matricula-facil-api</artifactId>
+	<artifactId>easy-enrollment-api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>matricula-facil-api</name>
 	<description> Api para el control de registros de matrícula de los estudiantes de una academia</description>

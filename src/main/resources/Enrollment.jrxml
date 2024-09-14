@@ -66,7 +66,7 @@
 	<queryString>
 		<![CDATA[]]>
 	</queryString>
-	<field name="course" class="com.agutierrezl.matricula_facil_api.model.Course"/>
+	<field name="course" class="com.agutierrezl.easy_enrollment_api.model.Course"/>
 	<title>
 		<band height="199" splitType="Stretch">
 			<staticText>
