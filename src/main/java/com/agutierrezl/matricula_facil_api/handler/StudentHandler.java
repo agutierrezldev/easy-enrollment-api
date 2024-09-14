@@ -3,6 +3,7 @@ package com.agutierrezl.matricula_facil_api.handler;
 import com.agutierrezl.matricula_facil_api.dto.StudentDTO;
 import com.agutierrezl.matricula_facil_api.model.Student;
 import com.agutierrezl.matricula_facil_api.service.IStudentService;
+import com.agutierrezl.matricula_facil_api.validator.RequestValidator;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -23,6 +24,8 @@ public class StudentHandler {
     private final IStudentService studentService;
     @Qualifier("studentMapper")
     private final ModelMapper modelMapper;
+
+    private final RequestValidator validator;
 
     public Mono<ServerResponse> findAll(ServerRequest request) {
         return ServerResponse
@@ -47,6 +50,7 @@ public class StudentHandler {
     public Mono<ServerResponse> save(ServerRequest request) {
         Mono<StudentDTO> StudentDTO = request.bodyToMono(StudentDTO.class);
         return StudentDTO
+                .flatMap(validator::validate)
                 .flatMap(e -> studentService.save(convertToDocument(e)))
                 .map(this::convertToDTO)
                 .flatMap(e -> ServerResponse
@@ -59,6 +63,7 @@ public class StudentHandler {
         String id = request.pathVariable("id");
         Mono<StudentDTO> StudentDTO = request.bodyToMono(StudentDTO.class);
         return StudentDTO
+                .flatMap(validator::validate)
                 .map(c -> {
                     c.setId(id);
                     return c;
