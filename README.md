@@ -1,1 +1,1 @@
-# matricula-facil-api
+# easy-enrollment-api
