@@ -133,6 +133,17 @@ public class StudentController {
                 .zipWith(monoLink , EntityModel::of); //(StudentDTO, link) -> EntityModel.of(StudentDTO, link)
     }
 
+    /*
+        Asc   : true
+        Desc  : false
+    * */
+    @GetMapping("/ascending/{asc}")
+    public Mono<ResponseEntity<Flux<StudentDTO>>> findAllByOrderByYearAscOrDesc(@PathVariable("asc") boolean order){
+        Flux<StudentDTO> Students = studentService.findAllByOrderByYearAscOrDesc(order).map(this::convertToDTO);
+        return Mono.just(ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(Students))
+                .defaultIfEmpty(ResponseEntity.notFound().build());
+    }
+
     private StudentDTO convertToDTO (Student model){
         return  modelMapper.map(model,StudentDTO.class);
     }

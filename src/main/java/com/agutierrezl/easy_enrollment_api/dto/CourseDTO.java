@@ -23,6 +23,6 @@ public class CourseDTO {
     @Size(min = 1, max = 10)
     private String codeCourse;
 
-    private boolean statusCourse;
+    private Boolean statusCourse;
 
 }

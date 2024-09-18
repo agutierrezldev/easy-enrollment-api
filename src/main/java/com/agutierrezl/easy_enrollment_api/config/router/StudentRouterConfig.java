@@ -16,6 +16,7 @@ public class StudentRouterConfig {
     public RouterFunction<ServerResponse> routes(StudentHandler handler) {
         return route(GET("v2/students"), handler::findAll) // req -> handler.findAll(req
                 .andRoute(GET("v2/students/{id}"), handler::findById)
+                .andRoute(GET("v2/students/ascending/{asc}"), handler::findAllByOrderByYearAscOrDesc) // Asc = true , other letter = false
                 .andRoute(POST("v2/students"), handler::save)
                 .andRoute(PUT("v2/students/{id}"), handler::update)
                 .andRoute(DELETE("v2/students/{id}"), handler::delete);

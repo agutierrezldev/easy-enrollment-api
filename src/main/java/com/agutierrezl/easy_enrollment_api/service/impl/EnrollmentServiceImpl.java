@@ -12,6 +12,7 @@ import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
@@ -56,7 +57,16 @@ public class EnrollmentServiceImpl extends CRUDImpl<Enrollment, String> implemen
                             item.setCourse(course);
                             return item;
                         })
+
                 ).toList();
+
+/*        Flux<EnrollmentDetail> enrollmentDetailFlux = Flux.fromIterable(list)
+//                .flatMap(mono -> mono);
+//
+//        enrollmentDetailFlux
+//                .doOnNext(enrollmentDetail -> System.out.println("Processed EnrollmentDetail: " + enrollmentDetail))
+//                .subscribe(); */
+
         return Mono.when(list).then(Mono.just(enrollment));
     }
 

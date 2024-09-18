@@ -90,6 +90,15 @@ public class StudentHandler {
                 });
     }
 
+    public Mono<ServerResponse> findAllByOrderByYearAscOrDesc(ServerRequest request) {
+        boolean asc = Boolean.parseBoolean(request.pathVariable("asc"));
+        return ServerResponse
+                .ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(studentService.findAllByOrderByYearAscOrDesc(asc)
+                        .map(this::convertToDTO), StudentDTO.class);
+    }
+
 
     private StudentDTO convertToDTO(Student model) {
         return modelMapper.map(model, StudentDTO.class);
