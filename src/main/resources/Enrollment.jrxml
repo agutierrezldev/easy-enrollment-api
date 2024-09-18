@@ -145,7 +145,7 @@
 			</staticText>
 			<staticText>
 				<reportElement x="95" y="40" width="245" height="15"/>
-				<text><![CDATA[https://github.com/agutierrezldev/matricula-facil-api]]></text>
+				<text><![CDATA[https://github.com/agutierrezldev/easy-enrollment-api]]></text>
 			</staticText>
 			<textField>
 				<reportElement x="465" y="10" width="90" height="20"/>
