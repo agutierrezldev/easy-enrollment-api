@@ -64,7 +64,7 @@ public class WebExceptionHandler extends AbstractErrorWebExceptionHandler {
             }
             case "401", "403" -> {
                 customError.setStatus(statusCode);
-                customError.setHttpStatus(HttpStatus.UNAUTHORIZED);
+                customError.setHttpStatus(HttpStatus.NOT_FOUND);
             }
             case "500" -> {
                 customError.setStatus(statusCode);
